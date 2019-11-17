@@ -50,7 +50,6 @@ class Robot : public frc::TimedRobot {
     Toggle isGrabbing{false};
 
     frc::I2C arduino{frc::I2C::Port::kOnboard, 4};
-    WPI_TalonSRX motors[4] = {left_front, right_front, left_back, right_back};
 
     // interate through all the motors objects and configure their values
 

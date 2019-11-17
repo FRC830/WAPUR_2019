@@ -16,12 +16,14 @@
 using namespace frc;
 
 void Robot::RobotInit() {
-    for (int i = 0; i < 4; i++) {
-        motors[i].ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
-        motors[i].Config_kP(1, 0, 0);
-        motors[i].Config_kI(0, 0, 0);
-        motors[i].Config_kD(0, 0, 0);
-    }
+    left_front.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
+    left_front.Config_kP(1, 0, 0);
+    right_front.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
+    right_front.Config_kP(1, 0, 0);
+    right_back.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
+    right_back.Config_kP(1, 0, 0);
+    left_back.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
+    left_back.Config_kP(1, 0, 0);
     // sparkMotor.RestoreFactoryDefaults();
     // auto encoder = sparkMotor.GetEncoder();
     // encoder.SetPosition(0);
@@ -51,7 +53,6 @@ void Robot::TeleopPeriodic() {
     double front_right = forward - turn - right;
     double back_left = forward + turn - right;
     double back_right = forward - turn + right;
-    // drive.DriveCartesian(rawX, -rawY, turn);
     double max_val = fabs(front_left);
     if (fabs(front_right) > max_val) { max_val = fabs(front_right); }
     if (fabs(back_left) > max_val) { max_val = fabs(back_left); }
