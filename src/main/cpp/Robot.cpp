@@ -16,6 +16,12 @@
 using namespace frc;
 
 void Robot::RobotInit() {
+    for (int i = 0; i < 4; i++) {
+        motors[i].ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
+        motors[i].Config_kP(1, 0, 0);
+        motors[i].Config_kI(0, 0, 0);
+        motors[i].Config_kD(0, 0, 0);
+    }
     // sparkMotor.RestoreFactoryDefaults();
     // auto encoder = sparkMotor.GetEncoder();
     // encoder.SetPosition(0);
@@ -37,32 +43,56 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
 
   // Drivetrain
-    double rawX = fabs(pilot.GetX(LEFT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(LEFT);
-    double rawY = fabs(pilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetY(LEFT);
+    double right = fabs(pilot.GetX(LEFT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(LEFT);
+    double forward = fabs(pilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : -pilot.GetY(LEFT);
     double turn = fabs(pilot.GetX(RIGHT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(RIGHT);
-    drive.DriveCartesian(rawX, -rawY, turn);
+    turn = turn * sensitivity;
+    double front_left = forward + turn + right;
+    double front_right = forward - turn - right;
+    double back_left = forward + turn - right;
+    double back_right = forward - turn + right;
+    // drive.DriveCartesian(rawX, -rawY, turn);
+    double max_val = fabs(front_left);
+    if (fabs(front_right) > max_val) { max_val = fabs(front_right); }
+    if (fabs(back_left) > max_val) { max_val = fabs(back_left); }
+    if (fabs(back_right) > max_val) { max_val = fabs(back_right); }
+    if (max_val > 1) {
+        front_left /= max_val;
+        front_right /= max_val;
+        back_left /= max_val;
+        back_right /= max_val;
+    }
+    SmartDashboard::PutNumber("READ forward", forward);
+    SmartDashboard::PutNumber("READ right", right);
+    SmartDashboard::PutNumber("READ turn_scaled", turn);
+    SmartDashboard::PutNumber("front_right motor output", front_right);
+    SmartDashboard::PutNumber("front_left motor output", front_left);
+    SmartDashboard::PutNumber("back_right motor output", back_right);
+    SmartDashboard::PutNumber("back_left motor output", back_left);
+    HandleManipulator();
+    HandleLEDStrip();
 
-
-    /*Pistons*/
+}
+void Robot::HandleManipulator() {
     // Shoot ball
     if (copilot.GetAButton()) {
-      isGrabbing.toggle(false);
-      punchPiston.Set(true);
+        isGrabbing.toggle(false);
+        punchPiston.Set(true);
     } else {
-      punchPiston.Set(false);
+        punchPiston.Set(false);
     }
 
     isGrabbing.toggle(copilot.GetXButton());  // so they only have to press it once
 
     if (isGrabbing) {
-      leftPiston.Set(true);
-      rightPiston.Set(true);
+        leftPiston.Set(true);
+        rightPiston.Set(true);
     } else {
         leftPiston.Set(false);
         rightPiston.Set(false);
     }
-    
-    // LEDS
+}
+void Robot::HandleLEDStrip() {
     uint8_t led_mode = NONE;
     int pov = copilot.GetPOV();
     if (45 <= pov && pov <= 135) {
@@ -87,7 +117,6 @@ void Robot::TeleopPeriodic() {
     if (led_mode != NONE) {
         arduino.WriteBulk(&led_mode, 1);
     }
-
 }
 void Robot::TestPeriodic() {}
 
