@@ -28,10 +28,10 @@ class Robot : public frc::TimedRobot {
     void HandleManipulator();
 
     // pin const declarations
-    const int LEFT_FRONT_PIN = 3;
-    const int LEFT_BACK_PIN = 1;
-    const int RIGHT_BACK_PIN = 6;
-    const int RIGHT_FRONT_PIN = 5;
+    const int LEFT_FRONT_PIN = 1;
+    const int LEFT_BACK_PIN = 2;
+    const int RIGHT_BACK_PIN = 3;
+    const int RIGHT_FRONT_PIN = 4;
     const int DEVICE_ID = 2;
     //Replace with real solonoid pin numbers later
     const int LEFT_SOLONOID_PIN = 0;                  
@@ -43,10 +43,10 @@ class Robot : public frc::TimedRobot {
     frc::Solenoid rightPiston{RIGHT_SOLONOID_PIN};
     frc::Solenoid punchPiston{CENTER_SOLONOID_PIN};
     // declare the motors objects
-    WPI_TalonSRX left_back{LEFT_BACK_PIN};
-    WPI_TalonSRX right_back{RIGHT_BACK_PIN};
-    WPI_TalonSRX left_front{LEFT_FRONT_PIN};
-    WPI_TalonSRX right_front{RIGHT_FRONT_PIN};
+    TalonSRX left_back{LEFT_BACK_PIN};
+    TalonSRX right_back{RIGHT_BACK_PIN};
+    TalonSRX left_front{LEFT_FRONT_PIN};
+    TalonSRX right_front{RIGHT_FRONT_PIN};
     Toggle isGrabbing{false};
 
     frc::I2C arduino{frc::I2C::Port::kOnboard, 4};
@@ -59,7 +59,7 @@ class Robot : public frc::TimedRobot {
     // drive.setTargetVelocity(10)?
     frc::XboxController pilot{0};
     frc::XboxController copilot{1};
-    static constexpr double sensitivity = 0.1;
+    static constexpr double sensitivity = 1;
     static const frc::GenericHID::JoystickHand LEFT = frc::GenericHID::kLeftHand;
     static const frc::GenericHID::JoystickHand RIGHT = frc::GenericHID::kRightHand;
     static constexpr double DEADZONE_THRESHOLD = 0.1;
