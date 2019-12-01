@@ -27,12 +27,12 @@ class Robot : public frc::TimedRobot {
       void HandleLEDStrip();
       void HandleManipulator();
       void HandleDrivetrain();
-
       // pin const declarations
       const int LEFT_FRONT_PIN = 1;
       const int LEFT_BACK_PIN = 2;
       const int RIGHT_BACK_PIN = 3;
       const int RIGHT_FRONT_PIN = 4;
+      const int ARM_MOTOR_PIN = 5; //change
       const int DEVICE_ID = 2;
       //Replace with real solonoid pin numbers later
       const int LEFT_SOLONOID_PIN = 5;
@@ -48,6 +48,7 @@ class Robot : public frc::TimedRobot {
       TalonSRX right_back{RIGHT_BACK_PIN};
       TalonSRX left_front{LEFT_FRONT_PIN};
       TalonSRX right_front{RIGHT_FRONT_PIN};
+      VictorSPX arm_motor{ARM_MOTOR_PIN};
       Toggle isGrabbing{false};
 
       frc::I2C arduino{frc::I2C::Port::kOnboard, 4};

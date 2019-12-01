@@ -42,21 +42,29 @@ void Robot::AutonomousInit() {
     right_back.SetSelectedSensorPosition(0,0);
     left_back.SetSelectedSensorPosition(0,0);
     left_front.SetSelectedSensorPosition(0,0);
+    right_front.ConfigPeakOutputForward(.5);
+    right_back.ConfigPeakOutputForward(.5);
+    left_back.ConfigPeakOutputForward(.5);
+    left_front.ConfigPeakOutputForward(.5);
 }
 
 void Robot::AutonomousPeriodic() {
     // between 7ft and 14ft = 10.5ft
     // distance to go / circum = # of ticks
     // MOVE ticks * ticks/rev
-
-    const position = (10.5 * 12) / (6*3.1415) * 4096; //ticks/rev 
+    const double position = (10.5 * 12) / (6*3.1415) * 4096; //ticks/rev 
     right_front.Set(motorcontrol::ControlMode::Position, position);
     right_back.Set(motorcontrol::ControlMode::Position, position);
     left_front.Set(motorcontrol::ControlMode::Position, position);
     left_back.Set(motorcontrol::ControlMode::Position, position);
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopInit() {
+    right_front.ConfigPeakOutputForward(1);
+    right_back.ConfigPeakOutputForward(1);
+    left_back.ConfigPeakOutputForward(1);
+    left_front.ConfigPeakOutputForward(1);
+}
 
 void Robot::TeleopPeriodic() {
 
@@ -95,6 +103,7 @@ void Robot::HandleDrivetrain() {
         back_right_value /= max_val;
     }
     // multiply by velocity and set motors
+
     front_left_value *= velocityConvertConstant;
     back_left_value *= velocityConvertConstant;
     back_right_value *= velocityConvertConstant;
@@ -103,7 +112,6 @@ void Robot::HandleDrivetrain() {
     right_back.Set(motorcontrol::ControlMode::Velocity, back_right_value);
     left_front.Set(motorcontrol::ControlMode::Velocity, front_left_value);
     left_back.Set(motorcontrol::ControlMode::Velocity, back_left_value);
-
     SmartDashboard::PutNumber("READ forward", forward);
     SmartDashboard::PutNumber("READ right", right);
     SmartDashboard::PutNumber("READ turn_scaled", turn);
@@ -131,6 +139,9 @@ void Robot::HandleManipulator() {
         leftPiston.Set(false);
         rightPiston.Set(false);
     }
+    
+    double change = fabs(copilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : copilot.GetY(LEFT);
+    arm_motor.Set(motorcontrol::ControlMode::PercentOutput, change);
 }
 void Robot::HandleLEDStrip() {
     uint8_t led_mode = NONE;
