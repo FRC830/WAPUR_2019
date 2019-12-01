@@ -36,9 +36,25 @@ void Robot::RobotInit() {
 
 void Robot::RobotPeriodic() {}
 
-void Robot::AutonomousInit() {}
+void Robot::AutonomousInit() {
+    // zero all sensors
+    right_front.SetSelectedSensorPosition(0,0);
+    right_back.SetSelectedSensorPosition(0,0);
+    left_back.SetSelectedSensorPosition(0,0);
+    left_front.SetSelectedSensorPosition(0,0);
+}
 
-void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousPeriodic() {
+    // between 7ft and 14ft = 10.5ft
+    // distance to go / circum = # of ticks
+    // MOVE ticks * ticks/rev
+
+    const position = (10.5 * 12) / (6*3.1415) * 4096; //ticks/rev 
+    right_front.Set(motorcontrol::ControlMode::Position, position);
+    right_back.Set(motorcontrol::ControlMode::Position, position);
+    left_front.Set(motorcontrol::ControlMode::Position, position);
+    left_back.Set(motorcontrol::ControlMode::Position, position);
+}
 
 void Robot::TeleopInit() {}
 
@@ -52,7 +68,8 @@ void Robot::TeleopPeriodic() {
 void Robot::HandleDrivetrain() {
     // Drivetrain
     // velocity setpoint in units/100ms
-    // rpm * units/rev * 600 100ms in every min
+    // rev/min * unit/rev * min/100ms => units/100ms
+    // 500 * 4096 * 1/600
     const double velocityConvertConstant = 500.0 * 4096 / 600;
     double right = fabs(pilot.GetX(LEFT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(LEFT);
     double forward = fabs(pilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : -pilot.GetY(LEFT);
