@@ -44,6 +44,12 @@ void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
 
+    HandleDrivetrain();
+    HandleManipulator();
+    HandleLEDStrip();
+
+}
+void Robot::HandleDrivetrain() {
     // Drivetrain
     // velocity setpoint in units/100ms
     // rpm * units/rev * 600 100ms in every min
@@ -55,17 +61,16 @@ void Robot::TeleopPeriodic() {
     right *= fabs(right);
     forward *= fabs(forward);
     turn *= fabs(turn);
-    // normalize all values to [-1, 1]
     double front_left_value = forward + turn + right;
     double front_right_value = forward - turn - right;
     double back_left_value = forward + turn - right;
     double back_right_value = forward - turn + right;
+    // determine max
     double max_val = fabs(front_left_value);
-    if (fabs(front_right_value) > max_val) {
-        max_val = fabs(front_right_value);
-    }
+    if (fabs(front_right_value) > max_val) { max_val = fabs(front_right_value); }
     if (fabs(back_left_value) > max_val) { max_val = fabs(back_left_value); }
     if (fabs(back_right_value) > max_val) { max_val = fabs(back_right_value); }
+    // normalize all values to [-1, 1]
     if (max_val > 1) {
         front_left_value /= max_val;
         front_right_value /= max_val;
@@ -89,9 +94,6 @@ void Robot::TeleopPeriodic() {
     SmartDashboard::PutNumber("front_left motor output", front_left_value);
     SmartDashboard::PutNumber("back_right motor output", back_right_value);
     SmartDashboard::PutNumber("back_left motor output", back_left_value);
-    HandleManipulator();
-    HandleLEDStrip();
-
 }
 void Robot::HandleManipulator() {
     // Shoot ball
