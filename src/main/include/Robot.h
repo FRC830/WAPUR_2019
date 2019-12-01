@@ -34,9 +34,9 @@ class Robot : public frc::TimedRobot {
     const int RIGHT_FRONT_PIN = 4;
     const int DEVICE_ID = 2;
     //Replace with real solonoid pin numbers later
-    const int LEFT_SOLONOID_PIN = 0;                  
-    const int RIGHT_SOLONOID_PIN = 0;
-    const int CENTER_SOLONOID_PIN = 0;
+    const int LEFT_SOLONOID_PIN = 5;                  
+    const int RIGHT_SOLONOID_PIN = 5;
+    const int CENTER_SOLONOID_PIN = 3;
     // Solonoids
 
     frc::Solenoid leftPiston{LEFT_SOLONOID_PIN};
@@ -62,7 +62,7 @@ class Robot : public frc::TimedRobot {
     static constexpr double sensitivity = 1;
     static const frc::GenericHID::JoystickHand LEFT = frc::GenericHID::kLeftHand;
     static const frc::GenericHID::JoystickHand RIGHT = frc::GenericHID::kRightHand;
-    static constexpr double DEADZONE_THRESHOLD = 0.1;
+    static constexpr double DEADZONE_THRESHOLD = 0.15;
 
    private:
 };

@@ -22,21 +22,16 @@ void Robot::RobotInit() {
     left_back.ConfigFactoryDefault();
 
     left_front.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
-    left_front.Config_kP(1, 0, 0);
+    left_front.Config_kP(0, 1);
     right_front.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
-    right_front.Config_kP(1, 0, 0);
+    right_front.Config_kP(0, 1);
     right_back.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
-    right_back.Config_kP(1, 0, 0);
+    right_back.Config_kP(0, 1);
     left_back.ConfigSelectedFeedbackSensor(FeedbackDevice::CTRE_MagEncoder_Absolute, 1, 0);
-    left_back.Config_kP(1, 0, 0);
-    // sparkMotor.RestoreFactoryDefaults();
-    // auto encoder = sparkMotor.GetEncoder();
-    // encoder.SetPosition(0);
-    // auto PID_controller = sparkMotor.GetPIDController();
-    // PID_controller.SetFeedbackDevice(encoder);
-    // PID_controller.SetP(1);
-    // PID_controller.SetI(0);
-    // PID_controller.SetD(0);
+    left_back.Config_kP(0, 1);
+
+    right_front.SetInverted(true);
+    right_back.SetInverted(true);
 }
 
 void Robot::RobotPeriodic() {}
@@ -56,7 +51,11 @@ void Robot::TeleopPeriodic() {
     double right = fabs(pilot.GetX(LEFT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(LEFT);
     double forward = fabs(pilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : -pilot.GetY(LEFT);
     double turn = fabs(pilot.GetX(RIGHT)) < DEADZONE_THRESHOLD ? 0 : pilot.GetX(RIGHT);
-    turn = turn * sensitivity;
+    // square outputs
+    right *= fabs(right);
+    forward *= fabs(forward);
+    turn *= fabs(turn);
+    // normalize all values to [-1, 1]
     double front_left_value = forward + turn + right;
     double front_right_value = forward - turn - right;
     double back_left_value = forward + turn - right;
@@ -73,18 +72,15 @@ void Robot::TeleopPeriodic() {
         back_left_value /= max_val;
         back_right_value /= max_val;
     }
-    // front_left_value *= velocityConvertConstant;
-    // back_left_value *= velocityConvertConstant;
-    // back_right_value *= velocityConvertConstant;
-    // front_right_value *= velocityConvertConstant;
-    // right_front.Set(motorcontrol::ControlMode::Velocity, front_right_value);
-    // right_back.Set(motorcontrol::ControlMode::Velocity, back_right_value);
-    // left_front.Set(motorcontrol::ControlMode::Velocity, front_left_value);
-    // left_back.Set(motorcontrol::ControlMode::Velocity, back_left_value);
-    right_front.Set(motorcontrol::ControlMode::PercentOutput, -front_right_value);
-    right_back.Set(motorcontrol::ControlMode::PercentOutput, -back_right_value);
-    left_front.Set(motorcontrol::ControlMode::PercentOutput, front_left_value);
-    left_back.Set(motorcontrol::ControlMode::PercentOutput, back_left_value);
+    // multiply by velocity and set motors
+    front_left_value *= velocityConvertConstant;
+    back_left_value *= velocityConvertConstant;
+    back_right_value *= velocityConvertConstant;
+    front_right_value *= velocityConvertConstant;
+    right_front.Set(motorcontrol::ControlMode::Velocity, front_right_value);
+    right_back.Set(motorcontrol::ControlMode::Velocity, back_right_value);
+    left_front.Set(motorcontrol::ControlMode::Velocity, front_left_value);
+    left_back.Set(motorcontrol::ControlMode::Velocity, back_left_value);
 
     SmartDashboard::PutNumber("READ forward", forward);
     SmartDashboard::PutNumber("READ right", right);
