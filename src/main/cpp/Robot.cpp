@@ -32,6 +32,7 @@ void Robot::RobotInit() {
 
     right_front.SetInverted(true);
     right_back.SetInverted(true);
+    arm_motor.SetInverted(true);
 }
 
 void Robot::RobotPeriodic() {}
@@ -52,7 +53,11 @@ void Robot::AutonomousPeriodic() {
     // between 7ft and 14ft = 10.5ft
     // distance to go / circum = # of ticks
     // MOVE ticks * ticks/rev
-    const double position = (10.5 * 12) / (6*3.1415) * 4096; //ticks/rev 
+    const double position = ((5 * 12) / (6*3.1415)) * 4096; //ticks/rev
+    SmartDashboard::PutNumber("right_front", right_front.GetSelectedSensorPosition());
+    SmartDashboard::PutNumber("left_front", left_front.GetSelectedSensorPosition());
+    SmartDashboard::PutNumber("left_back", left_back.GetSelectedSensorPosition());
+    SmartDashboard::PutNumber("right_back", right_back.GetSelectedSensorPosition());
     right_front.Set(motorcontrol::ControlMode::Position, position);
     right_back.Set(motorcontrol::ControlMode::Position, position);
     left_front.Set(motorcontrol::ControlMode::Position, position);
@@ -104,10 +109,10 @@ void Robot::HandleDrivetrain() {
     }
     // multiply by velocity and set motors
 
-    front_left_value *= velocityConvertConstant;
-    back_left_value *= velocityConvertConstant;
-    back_right_value *= velocityConvertConstant;
-    front_right_value *= velocityConvertConstant;
+    front_left_value *= velocityConvertConstant * sensitivity;
+    back_left_value *= velocityConvertConstant * sensitivity;
+    back_right_value *= velocityConvertConstant * sensitivity;
+    front_right_value *= velocityConvertConstant * sensitivity;
     right_front.Set(motorcontrol::ControlMode::Velocity, front_right_value);
     right_back.Set(motorcontrol::ControlMode::Velocity, back_right_value);
     left_front.Set(motorcontrol::ControlMode::Velocity, front_left_value);
@@ -125,22 +130,28 @@ void Robot::HandleManipulator() {
     isGrabbing.toggle(copilot.GetXButton());  // so they only have to press it once
     
     if (copilot.GetAButton()) {
-        isGrabbing.toggle(false);
+        timer.Start();
+        isGrabbing = true;
+    }
+
+    if (timer.Get() > 0.3) {
         punchPiston.Set(true);
+    } else if (timer.Get() > 0.4) {
+        timer.Stop();
+        timer.Reset();
     } else {
         punchPiston.Set(false);
     }
 
 
     if (isGrabbing) {
-        leftPiston.Set(true);
-        rightPiston.Set(true);
+        grabPiston.Set(true);
     } else {
-        leftPiston.Set(false);
-        rightPiston.Set(false);
+        grabPiston.Set(false);
     }
     
     double change = fabs(copilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : copilot.GetY(LEFT);
+    change *= fabs(change) * sensitivity;
     arm_motor.Set(motorcontrol::ControlMode::PercentOutput, change);
 }
 void Robot::HandleLEDStrip() {

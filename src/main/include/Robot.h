@@ -10,7 +10,7 @@
 #include <ctre/Phoenix.h>
 #include <frc/WPILib.h>
 #include <frc/smartdashboard/SendableChooser.h>
-
+#include <frc/Timer.h>
 #include "Toggle.h"
 //Delete?
 // #include <rev/CANSparkMax.h>
@@ -35,13 +35,11 @@ class Robot : public frc::TimedRobot {
       const int ARM_MOTOR_PIN = 5; //change
       const int DEVICE_ID = 2;
       //Replace with real solonoid pin numbers later
-      const int LEFT_SOLONOID_PIN = 5;
-      const int RIGHT_SOLONOID_PIN = 5;
+      const int GRAB_SOLONOID_PIN = 5;
       const int CENTER_SOLONOID_PIN = 3;
       // Solonoids
 
-      frc::Solenoid leftPiston{LEFT_SOLONOID_PIN};
-      frc::Solenoid rightPiston{RIGHT_SOLONOID_PIN};
+      frc::Solenoid grabPiston{GRAB_SOLONOID_PIN};
       frc::Solenoid punchPiston{CENTER_SOLONOID_PIN};
       // declare the motors objects
       TalonSRX left_back{LEFT_BACK_PIN};
@@ -50,7 +48,7 @@ class Robot : public frc::TimedRobot {
       TalonSRX right_front{RIGHT_FRONT_PIN};
       VictorSPX arm_motor{ARM_MOTOR_PIN};
       Toggle isGrabbing{false};
-
+      frc::Timer timer;
       frc::I2C arduino{frc::I2C::Port::kOnboard, 4};
 
       // interate through all the motors objects and configure their values
