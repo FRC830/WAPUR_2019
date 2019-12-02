@@ -53,15 +53,25 @@ void Robot::AutonomousPeriodic() {
     // between 7ft and 14ft = 10.5ft
     // distance to go / circum = # of ticks
     // MOVE ticks * ticks/rev
-    const double position = ((5 * 12) / (6*3.1415)) * 4096; //ticks/rev
+    const double position = ((3 * 12) / (6*3.1415)) * 4096; //ticks/rev
     SmartDashboard::PutNumber("right_front", right_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_front", left_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_back", left_back.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("right_back", right_back.GetSelectedSensorPosition());
-    right_front.Set(motorcontrol::ControlMode::Position, position);
-    right_back.Set(motorcontrol::ControlMode::Position, position);
-    left_front.Set(motorcontrol::ControlMode::Position, position);
-    left_back.Set(motorcontrol::ControlMode::Position, position);
+
+    if (right_back.GetSelectedSensorPosition() < position) {
+
+    right_front.Set(motorcontrol::ControlMode::PercentOutput, 1);
+    right_back.Set(motorcontrol::ControlMode::PercentOutput, 1);
+    left_front.Set(motorcontrol::ControlMode::PercentOutput, 1);
+    left_back.Set(motorcontrol::ControlMode::PercentOutput, 1);
+    } else {
+    right_front.Set(motorcontrol::ControlMode::PercentOutput, 0);
+    right_back.Set(motorcontrol::ControlMode::PercentOutput, 0);
+    left_front.Set(motorcontrol::ControlMode::PercentOutput, 0);
+    left_back.Set(motorcontrol::ControlMode::PercentOutput, 0);
+
+    }
 }
 
 void Robot::TeleopInit() {
