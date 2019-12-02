@@ -133,10 +133,10 @@ void Robot::HandleManipulator() {
         timer.Start();
         isGrabbing = true;
     }
-
-    if (timer.Get() > 0.3) {
+    double startTimer = SmartDashboard::GetNumber("startTimer", 0.15);
+    if (timer.Get() > startTimer) {
         punchPiston.Set(true);
-    } else if (timer.Get() > 0.4) {
+    } else if (timer.Get() > startTimer + .1) {
         timer.Stop();
         timer.Reset();
     } else {
