@@ -48,6 +48,7 @@ class Robot : public frc::TimedRobot {
       TalonSRX right_front{RIGHT_FRONT_PIN};
       VictorSPX arm_motor{ARM_MOTOR_PIN};
       Toggle isGrabbing{false};
+      Toggle testPunch{false};
       frc::Timer timer;
       frc::I2C arduino{frc::I2C::Port::kOnboard, 4};
 

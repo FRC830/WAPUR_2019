@@ -53,7 +53,7 @@ void Robot::AutonomousPeriodic() {
     // between 7ft and 14ft = 10.5ft
     // distance to go / circum = # of ticks
     // MOVE ticks * ticks/rev
-    const double position = ((3 * 12) / (6*3.1415)) * 4096; //ticks/rev
+    const double position = ((14.8) / (6*3.1415)) * 4096; //ticks/rev
     SmartDashboard::PutNumber("right_front", right_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_front", left_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_back", left_back.GetSelectedSensorPosition());
@@ -143,17 +143,21 @@ void Robot::HandleManipulator() {
         timer.Start();
         isGrabbing = true;
     }
-    double startTimer = SmartDashboard::GetNumber("startTimer", 0.15);
-    if (timer.Get() > startTimer) {
-        punchPiston.Set(true);
-    } else if (timer.Get() > startTimer + .1) {
+    double startTimer = 0.15;
+    if (timer.Get() > startTimer + .2) {
         timer.Stop();
         timer.Reset();
+    } else if (timer.Get() > startTimer) {
+        punchPiston.Set(true);
     } else {
         punchPiston.Set(false);
     }
-
-
+    // testPunch.toggle(copilot.GetYButton());
+    // if (testPunch) {
+    //     punchPiston.Set(true);
+    // } else {
+    //     punchPiston.Set(false);
+    // }
     if (isGrabbing) {
         grabPiston.Set(true);
     } else {
@@ -162,7 +166,7 @@ void Robot::HandleManipulator() {
     
     double change = fabs(copilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : copilot.GetY(LEFT);
     change *= fabs(change) * sensitivity;
-    arm_motor.Set(motorcontrol::ControlMode::PercentOutput, change);
+    arm_motor.Set(motorcontrol::ControlMode::PercentOutput, -change);
 }
 void Robot::HandleLEDStrip() {
     uint8_t led_mode = NONE;
