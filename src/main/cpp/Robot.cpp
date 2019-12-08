@@ -53,7 +53,7 @@ void Robot::AutonomousPeriodic() {
     // between 7ft and 14ft = 10.5ft
     // distance to go / circum = # of ticks
     // MOVE ticks * ticks/rev
-    const double position = ((14.8) / (6*3.1415)) * 4096; //ticks/rev
+    const double position = ((13.0) / (6*3.1415)) * 4096; //ticks/rev
     SmartDashboard::PutNumber("right_front", right_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_front", left_front.GetSelectedSensorPosition());
     SmartDashboard::PutNumber("left_back", left_back.GetSelectedSensorPosition());
@@ -61,10 +61,10 @@ void Robot::AutonomousPeriodic() {
 
     if (right_back.GetSelectedSensorPosition() < position) {
 
-    right_front.Set(motorcontrol::ControlMode::PercentOutput, 1);
-    right_back.Set(motorcontrol::ControlMode::PercentOutput, 1);
-    left_front.Set(motorcontrol::ControlMode::PercentOutput, 1);
-    left_back.Set(motorcontrol::ControlMode::PercentOutput, 1);
+    right_front.Set(motorcontrol::ControlMode::PercentOutput, 0.3);
+    right_back.Set(motorcontrol::ControlMode::PercentOutput, 0.3);
+    left_front.Set(motorcontrol::ControlMode::PercentOutput, 0.3);
+    left_back.Set(motorcontrol::ControlMode::PercentOutput, 0.3);
     } else {
     right_front.Set(motorcontrol::ControlMode::PercentOutput, 0);
     right_back.Set(motorcontrol::ControlMode::PercentOutput, 0);
@@ -118,15 +118,15 @@ void Robot::HandleDrivetrain() {
         back_right_value /= max_val;
     }
     // multiply by velocity and set motors
-
-    front_left_value *= velocityConvertConstant * sensitivity;
-    back_left_value *= velocityConvertConstant * sensitivity;
-    back_right_value *= velocityConvertConstant * sensitivity;
-    front_right_value *= velocityConvertConstant * sensitivity;
-    right_front.Set(motorcontrol::ControlMode::Velocity, front_right_value);
-    right_back.Set(motorcontrol::ControlMode::Velocity, back_right_value);
-    left_front.Set(motorcontrol::ControlMode::Velocity, front_left_value);
-    left_back.Set(motorcontrol::ControlMode::Velocity, back_left_value);
+    
+    // front_left_value *= velocityConvertConstant * sensitivity;
+    // back_left_value *= velocityConvertConstant * sensitivity;
+    // back_right_value *= velocityConvertConstant * sensitivity;
+    // front_right_value *= velocityConvertConstant * sensitivity;
+    right_front.Set(motorcontrol::ControlMode::PercentOutput, front_right_value);
+    right_back.Set(motorcontrol::ControlMode::PercentOutput, back_right_value);
+    left_front.Set(motorcontrol::ControlMode::PercentOutput, front_left_value);
+    left_back.Set(motorcontrol::ControlMode::PercentOutput, back_left_value);
     SmartDashboard::PutNumber("READ forward", forward);
     SmartDashboard::PutNumber("READ right", right);
     SmartDashboard::PutNumber("READ turn_scaled", turn);
@@ -136,13 +136,14 @@ void Robot::HandleDrivetrain() {
     SmartDashboard::PutNumber("back_left motor output", back_left_value);
 }
 void Robot::HandleManipulator() {
-    // Shoot ball
+
     isGrabbing.toggle(copilot.GetXButton());  // so they only have to press it once
-    
+    // Shoot ball
     if (copilot.GetAButton()) {
         timer.Start();
         isGrabbing = true;
     }
+    // Shoot Routine
     double startTimer = 0.15;
     if (timer.Get() > startTimer + .2) {
         timer.Stop();
@@ -165,7 +166,7 @@ void Robot::HandleManipulator() {
     }
     
     double change = fabs(copilot.GetY(LEFT)) < DEADZONE_THRESHOLD ? 0 : copilot.GetY(LEFT);
-    change *= fabs(change) * sensitivity;
+    change *= fabs(change) * sensitivity * 0.3;
     arm_motor.Set(motorcontrol::ControlMode::PercentOutput, -change);
 }
 void Robot::HandleLEDStrip() {
